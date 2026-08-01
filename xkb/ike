@@ -1,0 +1,69 @@
+// Inuktitut (syllabics) with Windows-compatible AltGr levels.
+// Based on system ca(ike) + Windows "Inuktitut - Latin" / Naqittaut AltGr
+// long-vowel / alternate syllabics (Ctrl+Alt = AltGr on Windows).
+//
+// Levels: 1=base  2=Shift  3=Right Alt (AltGr)  4=AltGr+Shift
+// Example: Q → ᖏ, Shift+Q → ᒋ, AltGr+Q → ᖐ, AltGr+Shift+Q → ᒌ
+
+default partial alphanumeric_keys
+xkb_symbols "basic" {
+    name[Group1] = "Inuktitut";
+
+    // Number row — finals / digits (same as ca:ike); AltGr = Windows Latin punctuation
+    key <TLDE> { [ U157b, U1575,      asciitilde, asciitilde ] }; // ᕻ ᕵ
+    key <AE01> { [ U1595,      1,         exclam,   cent     ] }; // ᖕ 1 ! ¢
+    key <AE02> { [ U1449,      2,            at, registered ] }; // ᑉ 2 @ ®
+    key <AE03> { [ U1550,      3,    numbersign, onequarter ] }; // ᕐ 3 # ¼
+    key <AE04> { [ U1483,      4,        dollar,   onehalf  ] }; // ᒃ 4 $ ½
+    key <AE05> { [ U1466,      5,       percent, threequarters ] }; // ᑦ 5 % ¾
+    key <AE06> { [ U1585,      6,      asterisk, asciicircum ] }; // ᖅ 6 * ^
+    key <AE07> { [ U14bb,      7,     ampersand, U2154      ] }; // ᒻ 7 & ⅔
+    key <AE08> { [ U14d0,      8,        bullet, copyright  ] }; // ᓐ 8 • ©
+    key <AE09> { [ U14ea,      9,  bracketleft, division   ] }; // ᓪ 9 [ ÷
+    key <AE10> { [ U153e,      0, bracketright,      plus  ] }; // ᔾ 0 ] +
+    key <AE11> { [ minus, underscore,  VoidSymbol, VoidSymbol ] };
+    key <AE12> { [ U155d,  equal,         equal, VoidSymbol ] }; // ᕝ =
+
+    // Top letter row — short / long vowels via AltGr
+    key <AD01> { [ U158f, U148b, U1590, U148c ] }; // ᖏ ᒋ  ᖐ ᒌ
+    key <AD02> { [ U1403, U1431, U1404, U1432 ] }; // ᐃ ᐱ  ᐄ ᐲ
+    key <AD03> { [ U157f, U1546, U1580, U1547 ] }; // ᕿ ᕆ  ᖀ ᕇ
+    key <AD04> { [ U146d, U1596, U146e, U1596 ] }; // ᑭ ᖖ  ᑮ (NNG)
+    key <AD05> { [ U144e, U1671, U144f, U1672 ] }; // ᑎ ᙱ  ᑏ ᙲ
+    key <AD06> { [ U14ef, U1673, U14f0, U1674 ] }; // ᓯ ᙳ  ᓰ ᙴ
+    key <AD07> { [ U14a5, U1675, U14a6, U1676 ] }; // ᒥ ᙵ  ᒦ ᙶ
+    key <AD08> { [ U14c2, U15a4, U14c3, U15a5 ] }; // ᓂ ᖤ  ᓃ ᖥ
+    key <AD09> { [ U14d5, U15a0, U14d6, U15a1 ] }; // ᓕ ᖠ  ᓖ ᖡ
+    key <AD10> { [ U1528, U15a6, U1529, U15a6 ] }; // ᔨ ᖦ  ᔩ
+    key <AD11> { [ U14a1, U1505, U201c, U201d ] }; // ᒡ ᔅ  “ ”
+    key <AD12> { [ U141e, U141e, U2018, U2019 ] }; // ᐞ     ‘ ’
+
+    // Home row
+    key <AC01> { [ U1591, U148d, U1592, U148e ] }; // ᖑ ᒍ  ᖒ ᒎ
+    key <AC02> { [ U1405, U1433, U1406, U1434 ] }; // ᐅ ᐳ  ᐆ ᐴ
+    key <AC03> { [ U1581, U1548, U1582, U1549 ] }; // ᖁ ᕈ  ᖂ ᕉ
+    key <AC04> { [ U146f, U1555, U1470, U1556 ] }; // ᑯ ᕕ  ᑰ ᕖ
+    key <AC05> { [ U1450, parenleft, U1451, parenleft ] }; // ᑐ (  ᑑ
+    key <AC06> { [ U14f1, parenright, U14f2, parenright ] }; // ᓱ )  ᓲ
+    key <AC07> { [ U14a7, U152a, U14a8, U152b ] }; // ᒧ ᔪ  ᒨ ᔫ
+    key <AC08> { [ U14c4, U1557, U14c5, U1558 ] }; // ᓄ ᕗ  ᓅ ᕘ
+    key <AC09> { [ U14d7, U15a2, U14d8, U15a3 ] }; // ᓗ ᖢ  ᓘ ᖣ
+    key <AC10> { [ semicolon, colon, U014b, U014a ] }; // ; : ŋ Ŋ
+    key <AC11> { [ apostrophe, quotedbl, U0142, U0141 ] }; // ' " ł Ł
+    key <BKSL> { [ backslash, bar, slash, bar ] };
+
+    // Bottom row
+    key <LSGT> { [ U1579, U1577, U1579, U1577 ] }; // ᕹ ᕷ (ISO extra key)
+    key <AB01> { [ U1593, U1490, U1594, U1491 ] }; // ᖓ ᒐ  ᖔ ᒑ
+    key <AB02> { [ U140a, U1438, U140b, U1439 ] }; // ᐊ ᐸ  ᐋ ᐹ
+    key <AB03> { [ U1583, U154b, U1584, U154c ] }; // ᖃ ᕋ  ᖄ ᕌ
+    key <AB04> { [ U1472, question, U1473, braceleft ] }; // ᑲ ?  ᑳ {
+    key <AB05> { [ U1455, U157c, U1456, braceright ] }; // ᑕ ᕼ  ᑖ }
+    key <AB06> { [ U14f4, U14c7, U14f5, U14c8 ] }; // ᓴ ᓇ  ᓵ ᓈ
+    key <AB07> { [ U14aa, U14da, U14ab, U14db ] }; // ᒪ ᓚ  ᒫ ᓛ
+    key <AB08> { [ comma, less, comma, less ] };
+    key <AB09> { [ period, greater, period, greater ] };
+    key <AB10> { [ U152d, U1559, U152e, U155a ] }; // ᔭ ᕙ  ᔮ ᕚ
+
+    include "level3(ralt_switch)"
+};

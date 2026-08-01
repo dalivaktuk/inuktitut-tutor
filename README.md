@@ -63,10 +63,9 @@ on. Windows' Naqittaut layout *does* ship these natively on AltGr, so
 out of the box Linux is the odd one out here.
 
 The fix is a custom XKB layout adding right-Alt (`level3`) as a modifier.
-This project's author generated one with AI assistance; if you want long
-vowels on Linux you'll need to do the same, or extend the stock layout
-yourself. With that third level in place, the home row gains its long-vowel
-forms:
+**One is included in this repo at [`xkb/ike`](xkb/ike)** — originally
+generated with AI assistance and used daily by this project's author. With
+that third level in place, the home row gains its long-vowel forms:
 
 | Key | Base (stock) | Right-Alt (custom) |
 | --- | --- | --- |
@@ -83,9 +82,37 @@ So the regular home row reads ᐅᖁᑯᑐᓱᒧᓄᓗ and the right-Alt layer r
 ᐆᖂᑰᑑᓲᒨᓅᓘ. (The pattern is consistent across the block: the long form is
 always the base codepoint + 1.)
 
+**Installing it.** Copy the file into your user XKB directory:
+
+```sh
+mkdir -p ~/.config/xkb/symbols
+cp xkb/ike ~/.config/xkb/symbols/ike
+```
+
+On **Wayland** (GNOME, KDE, sway), libxkbcommon searches `~/.config/xkb`
+automatically — add/select the layout named `ike` in your usual keyboard
+settings, then log out and back in if it doesn't appear immediately.
+
+On **X11**, point the include path at that directory and compile it into the
+running server:
+
+```sh
+setxkbmap -I"$HOME/.config/xkb" ike -print | xkbcomp -I"$HOME/.config/xkb" - "$DISPLAY"
+```
+
+Right-Alt is the level-3 switch (the file ends with
+`include "level3(ralt_switch)"`), so `AltGr` + a key gives the long vowel and
+`AltGr` + `Shift` + a key gives the long form of the shifted glyph.
+
+> **Safe to use with this tutor:** the layout's base and Shift levels were
+> checked key-by-key against `src/layout.rs` and match on **all 40 keys** the
+> app models, so the course plays identically whether you run stock
+> `ca(ike)` or this custom layout. The extra long vowels sit on a third level
+> the app never asks for.
+
 > **Note:** the tutor itself does not currently teach the long-vowel layer —
 > `src/layout.rs` models two levels per key (base + Shift), matching the
-> stock layout, and no lesson targets a long vowel. A custom layout is
+> stock layout, and no lesson targets a long vowel. The custom layout is
 > therefore only needed for *general* Inuktitut typing outside the app, not
 > to complete the course.
 
@@ -198,3 +225,5 @@ Your terminal font needs to cover Unified Canadian Aboriginal Syllabics
 - `src/lessons.rs` — the thirteen lesson steps, authored in key notation and
   translated to target glyph sequences at load time
 - `src/save.rs` — plain-text progress persistence (`Ctrl+S`)
+- `xkb/ike` — optional custom Linux XKB layout adding a right-Alt level for
+  long vowels (see [Long vowels need a custom layout on Linux](#long-vowels-need-a-custom-layout-on-linux))
