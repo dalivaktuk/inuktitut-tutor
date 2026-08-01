@@ -47,27 +47,37 @@ back to your normal layout afterwards:
 setxkbmap us   # or whatever layout you use normally
 ```
 
-#### Long vowels need a custom layout on Linux
+#### Long vowels: built in on Windows/macOS, custom layout on Linux
 
-The stock `ca(ike)` layout shipped in `xkeyboard-config` defines only **two
-levels per key** — base and Shift. You can confirm this yourself:
+The long-vowel (doubled-vowel) syllabics — ᐆ ᖂ ᑰ ᑑ ᓲ ᒨ ᓅ ᓘ — live on a third
+keyboard level, reached with right-Alt or Option. **Windows and macOS give
+you that level by default. Linux is the only platform that needs extra
+setup:**
+
+| Platform | Long vowels | How |
+| --- | --- | --- |
+| Windows | Built in | `AltGr` (right Alt) + key, Caps Lock on |
+| macOS | Built in *(expected — see the macOS section)* | `Option` (⌥) + key, Caps Lock on |
+| Linux | Needs [`xkb/ike`](xkb/ike) from this repo | stock `ca(ike)` has only two levels per key |
+
+The reason Linux is the exception: the stock `ca(ike)` layout shipped in
+`xkeyboard-config` defines only **two levels per key** — base and Shift —
+so there is simply nowhere for a third level to live. Confirm it yourself:
 
 ```sh
 sed -n '/xkb_symbols "ike"/,/^};/p' /usr/share/X11/xkb/symbols/ca | grep 'key <AC'
 # key <AC01>  {[  U1591,    U148d  ]};   <- two entries, no third level
 ```
 
-That means the **long-vowel (doubled-vowel) syllabics are unreachable** on
-the stock Linux layout: there is no AltGr/right-Alt level for them to live
-on. Windows' Naqittaut layout *does* ship these natively on AltGr, so
-out of the box Linux is the odd one out here.
-
 The fix is a custom XKB layout adding right-Alt (`level3`) as a modifier.
 **One is included in this repo at [`xkb/ike`](xkb/ike)** — originally
 generated with AI assistance and used daily by this project's author. With
 that third level in place, the home row gains its long-vowel forms:
 
-| Key | Base (stock) | Right-Alt (custom) |
+(These codepoints are the same on all three platforms — only the way you
+reach them differs.)
+
+| Key | Base | Long vowel (`AltGr` / `Option`) |
 | --- | --- | --- |
 | `s` | ᐅ `U+1405` O   | ᐆ `U+1406` OO   |
 | `d` | ᖁ `U+1581` QO  | ᖂ `U+1582` QOO  |
@@ -132,6 +142,14 @@ produce a Latin letter instead of a syllabic (the app will show "layout not
 active?" in the footer if this happens — that's the fix). Regular Shift still
 works as expected for the app's Shift-layer lessons once Caps Lock is on.
 
+**Long vowels work out of the box.** With Caps Lock on, `AltGr` (right Alt)
++ a key gives that key's long vowel — `AltGr`+`S` → ᐆ, `AltGr`+`F` → ᑰ, and
+so on — and `AltGr`+`Shift`+ a key gives the long form of the shifted glyph.
+No custom layout needed; this is confirmed against Microsoft's published
+Naqittaut key chart, which lists the full OO-series on the AltGr level.
+(Linux needs [a bundled custom layout](#long-vowels-built-in-on-windowsmacos-custom-layout-on-linux)
+for the same thing.)
+
 ### macOS
 
 macOS ships a built-in Inuktitut input source too, though named differently
@@ -155,6 +173,17 @@ practice, do a quick sanity check:
    reality. If they don't, stop and say so rather than practicing wrong key
    positions — the layout most likely differs enough to need a custom
    `.keylayout` file instead of the built-in one.
+4. *(Optional, only if you want long vowels for general typing — the course
+   never needs them.)* Still with Caps Lock on, press `Option` (⌥) + `S` and
+   see whether `ᐆ` appears.
+
+**Long vowels — expected to work, but unconfirmed.** macOS uses `Option` as
+its level-3 modifier, so `Option` + a key *should* produce that key's long
+vowel (`Option`+`S` → ᐆ), the same way `AltGr` does on Windows. **Nobody has
+tested this on an actual Mac yet**, so treat it as expected rather than
+established. Step 4 above is the check. If a plain `ᐅ` appears instead, this
+layout most likely forms long vowels by pressing the vowel twice rather than
+via `Option` — worth reporting back so this section can be corrected.
 
 ### Controls
 
@@ -226,4 +255,4 @@ Your terminal font needs to cover Unified Canadian Aboriginal Syllabics
   translated to target glyph sequences at load time
 - `src/save.rs` — plain-text progress persistence (`Ctrl+S`)
 - `xkb/ike` — optional custom Linux XKB layout adding a right-Alt level for
-  long vowels (see [Long vowels need a custom layout on Linux](#long-vowels-need-a-custom-layout-on-linux))
+  long vowels (see [Long vowels](#long-vowels-built-in-on-windowsmacos-custom-layout-on-linux))
