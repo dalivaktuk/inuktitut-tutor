@@ -428,6 +428,29 @@ fn draw_exercise_cell(
 
 // -------------------------------------------------------------- footer ---
 
+/// What to tell the learner when their keypresses are arriving as Latin
+/// letters instead of syllabics. The *detection* is platform-agnostic (see
+/// `App::handle_char`), but the fix is not: Linux needs the layout selected
+/// at all, while the Windows and macOS layouts are Caps Lock-toggled dual
+/// mode, so a forgotten Caps Lock is by far the likeliest cause there.
+///
+/// Kept under the MIN_WIDTH floor (64 usable columns) so it doesn't wrap on
+/// a minimum-size terminal -- see `layout_hint_fits_min_width`.
+#[cfg(target_os = "windows")]
+fn layout_hint() -> &'static str {
+    "layout not active? Caps Lock on + Inuktitut - Naqittaut layout"
+}
+
+#[cfg(target_os = "macos")]
+fn layout_hint() -> &'static str {
+    "layout not active? Caps Lock on + Inuktitut input source"
+}
+
+#[cfg(not(any(target_os = "windows", target_os = "macos")))]
+fn layout_hint() -> &'static str {
+    "layout not active? run: setxkbmap ca ike"
+}
+
 fn draw_footer(f: &mut Frame, area: Rect, app: &App) {
     let block = Block::default().borders(Borders::ALL).border_style(Style::default().fg(DIM));
     let inner = block.inner(area);
@@ -473,7 +496,7 @@ fn draw_footer(f: &mut Frame, area: Rect, app: &App) {
         ))
     } else if app.layout_warning {
         Line::from(Span::styled(
-            "layout not active? run: setxkbmap ca ike",
+            layout_hint(),
             Style::default().fg(BAD).add_modifier(Modifier::BOLD),
         ))
     } else {
@@ -604,6 +627,36 @@ mod tests {
                 "footer hint truncated at width {width}: {text}"
             );
         }
+    }
+
+    /// The layout-not-active hint is the one message that tells a stuck
+    /// learner how to get unstuck, so it must fit on one line at the
+    /// narrowest supported terminal and must actually reach the screen.
+    /// Runs against whichever platform's `layout_hint()` is compiled in, so
+    /// CI covers the Linux, Windows, and macOS strings on their own runners.
+    #[test]
+    fn layout_hint_fits_min_width_and_renders() {
+        // 64 = MIN_WIDTH minus the footer block's left/right border.
+        assert!(
+            layout_hint().chars().count() <= 64,
+            "layout hint is {} chars, over the 64-column budget: {:?}",
+            layout_hint().chars().count(),
+            layout_hint(),
+        );
+
+        // 'z' is a key label, never a target glyph, so it trips the
+        // "your OS layout isn't sending syllabics" branch.
+        let mut app = App::new();
+        press(&mut app, 'z');
+        assert!(app.layout_warning, "pressing a Latin key should warn");
+
+        let mut terminal = Terminal::new(TestBackend::new(MIN_WIDTH, 45)).unwrap();
+        terminal.draw(|f| draw(f, &app)).unwrap();
+        let text = buffer_text(&terminal);
+        assert!(
+            text.contains(layout_hint()),
+            "layout hint missing or wrapped at MIN_WIDTH: {text}"
+        );
     }
 
     #[test]
