@@ -47,6 +47,48 @@ back to your normal layout afterwards:
 setxkbmap us   # or whatever layout you use normally
 ```
 
+#### Long vowels need a custom layout on Linux
+
+The stock `ca(ike)` layout shipped in `xkeyboard-config` defines only **two
+levels per key** — base and Shift. You can confirm this yourself:
+
+```sh
+sed -n '/xkb_symbols "ike"/,/^};/p' /usr/share/X11/xkb/symbols/ca | grep 'key <AC'
+# key <AC01>  {[  U1591,    U148d  ]};   <- two entries, no third level
+```
+
+That means the **long-vowel (doubled-vowel) syllabics are unreachable** on
+the stock Linux layout: there is no AltGr/right-Alt level for them to live
+on. Windows' Naqittaut layout *does* ship these natively on AltGr, so
+out of the box Linux is the odd one out here.
+
+The fix is a custom XKB layout adding right-Alt (`level3`) as a modifier.
+This project's author generated one with AI assistance; if you want long
+vowels on Linux you'll need to do the same, or extend the stock layout
+yourself. With that third level in place, the home row gains its long-vowel
+forms:
+
+| Key | Base (stock) | Right-Alt (custom) |
+| --- | --- | --- |
+| `s` | ᐅ `U+1405` O   | ᐆ `U+1406` OO   |
+| `d` | ᖁ `U+1581` QO  | ᖂ `U+1582` QOO  |
+| `f` | ᑯ `U+146F` KO  | ᑰ `U+1470` KOO  |
+| `g` | ᑐ `U+1450` TO  | ᑑ `U+1451` TOO  |
+| `h` | ᓱ `U+14F1` SO  | ᓲ `U+14F2` SOO  |
+| `j` | ᒧ `U+14A7` MO  | ᒨ `U+14A8` MOO  |
+| `k` | ᓄ `U+14C4` NO  | ᓅ `U+14C5` NOO  |
+| `l` | ᓗ `U+14D7` LO  | ᓘ `U+14D8` LOO  |
+
+So the regular home row reads ᐅᖁᑯᑐᓱᒧᓄᓗ and the right-Alt layer reads
+ᐆᖂᑰᑑᓲᒨᓅᓘ. (The pattern is consistent across the block: the long form is
+always the base codepoint + 1.)
+
+> **Note:** the tutor itself does not currently teach the long-vowel layer —
+> `src/layout.rs` models two levels per key (base + Shift), matching the
+> stock layout, and no lesson targets a long vowel. A custom layout is
+> therefore only needed for *general* Inuktitut typing outside the app, not
+> to complete the course.
+
 ### Windows
 
 Windows ships a matching layout out of the box: **Inuktitut - Naqittaut**.
