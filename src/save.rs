@@ -174,6 +174,6 @@ mod tests {
     #[test]
     fn load_from_missing_file_returns_none() {
         let path = std::env::temp_dir().join("inuktitut-tutor-test-does-not-exist.txt");
-        assert!(load_from(&path, 13).is_none());
+        assert!(load_from(&path, 14).is_none());
     }
 }

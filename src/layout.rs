@@ -128,15 +128,21 @@ fn key_def(key: char) -> Option<KeyDef> {
 /// - lowercase letter / digit / `[` / `/` / `,` / `.` -> that key's base glyph
 /// - uppercase letter -> that key's shift glyph (this is how a real `?`,
 ///   Shift+V, is authored -- write `V`)
-/// - `|` -> Shift + `/` (the one shifted-punctuation alias needed, since `/`
-///   has no uppercase form to piggyback on the rule above)
+/// - `|` -> Shift + `/`, and `{` -> Shift + `[`. These two punctuation keys
+///   have no uppercase form to piggyback on the rule above, so they get
+///   explicit aliases; `{` is the US-QWERTY shifted symbol of `[`.
 /// - space -> a literal space
 pub fn key_notation_to_glyph(c: char) -> Option<(char, bool)> {
     if c == ' ' {
         return Some((' ', false));
     }
-    if c == '|' {
-        let (_, _, shift, ..) = key_def('/')?;
+    // Shift aliases for the punctuation keys that have no uppercase form.
+    if let Some(key) = match c {
+        '|' => Some('/'),
+        '{' => Some('['),
+        _ => None,
+    } {
+        let (_, _, shift, ..) = key_def(key)?;
         return Some((shift?, true));
     }
     if c.is_ascii_uppercase() {
@@ -172,6 +178,15 @@ mod tests {
     #[test]
     fn pipe_is_the_shift_slash_alias() {
         assert_eq!(key_notation_to_glyph('|'), Some(('\u{1559}', true)));
+    }
+
+    #[test]
+    fn brace_is_the_shift_bracket_alias() {
+        // Shift+[ is ᔅ (s-final); `[` has no uppercase form, so it needs an
+        // explicit alias the way `/` does.
+        assert_eq!(key_notation_to_glyph('{'), Some(('\u{1505}', true)));
+        // The unshifted key still gives its base glyph.
+        assert_eq!(key_notation_to_glyph('['), Some(('\u{14a1}', false)));
     }
 
     #[test]

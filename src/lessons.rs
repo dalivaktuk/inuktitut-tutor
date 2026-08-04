@@ -1,4 +1,4 @@
-//! The thirteen graded lesson steps. Lines are authored in *key notation*
+//! The fourteen graded lesson steps. Lines are authored in *key notation*
 //! (see `layout::translate_line`) and translated into the glyph sequence at
 //! load time -- the key-notation strings below are the single source of
 //! truth.
@@ -158,8 +158,18 @@ pub fn all_lessons() -> Vec<Lesson> {
         ),
         Lesson::new(
             "STEP 11 — COLUMNS = CONSONANTS",
-            "same finger, three vowels: i / u / a",
-            &["qaz wsx edc rfv", "tgb yhn ujm ol", "ik p/"],
+            "three vowels i / u / a per consonant · last row needs Shift",
+            &[
+                // Seven consonants really are one finger, three rows.
+                "qaz wsx edc rfv",
+                "tgb yhn ujm",
+                // l, n and y break the pattern: their third vowel sits on
+                // the Shift layer of a right-index key, not a third key in
+                // the same column. Drilled together so the series still
+                // completes -- ᓕᓗᓚ, ᓂᓄᓇ, ᔨᔪᔭ.
+                "olM ikN pJ/",
+                "olM olM ikN ikN pJ/ pJ/",
+            ],
         ),
         Lesson::new(
             "STEP 12 — REAL WORDS",
@@ -174,6 +184,22 @@ pub fn all_lessons() -> Vec<Lesson> {
             "STEP 13 — SHIFT LAYER",
             "hold Shift · W/S/X · Q/A/Z · E/D/C · F/K/|",
             &["WSX WSX", "QAZ QAZ", "EDC EDC", "FK| FK|"],
+        ),
+        // Everything on the Shift layer the earlier steps never reach: the
+        // ᙱᙳᙵᖖ (nng) and ᖠᖢᖤᖦ (lh) series, plus the ᔅ and ᕼ finals. With
+        // this step the course targets every glyph in `layout::KEYS` --
+        // enforced by `every_layout_glyph_is_drilled` below.
+        Lesson::new(
+            "STEP 14 — THE REST OF THE SHIFT LAYER",
+            "ᙱᙳᙵᖖ nng · ᖠᖢᖤᖦ lh · ᔅ and ᕼ finals",
+            &[
+                "TT YY UU RR",
+                "TYU TYU RRRR",
+                "OO LL II PP",
+                "OLI OLI PPPP",
+                "{{ BB {{ BB",
+                "TYUR OLIP {B",
+            ],
         ),
     ]
 }
@@ -250,6 +276,40 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// Every glyph the layout can produce -- base *and* Shift, all 40 keys --
+    /// must be targeted by at least one lesson. Without this, glyphs silently
+    /// go untaught: ᓇ (Shift+N) and ᓚ (Shift+M) were missing for exactly this
+    /// reason, leaving the ᓂᓄᓇ and ᓕᓗᓚ series incomplete.
+    #[test]
+    fn every_layout_glyph_is_drilled() {
+        use crate::layout::KEYS;
+
+        let drilled: std::collections::HashSet<char> = all_lessons()
+            .iter()
+            .flat_map(|l| l.lines.iter())
+            .flatten()
+            .map(|c| c.glyph)
+            .collect();
+
+        let mut missing = Vec::new();
+        for &(key, base, shift, ..) in KEYS {
+            if !drilled.contains(&base) {
+                missing.push(format!("{base:?} (base of {key:?})"));
+            }
+            if let Some(s) = shift {
+                if !drilled.contains(&s) {
+                    missing.push(format!("{s:?} (Shift+{})", key.to_ascii_uppercase()));
+                }
+            }
+        }
+        assert!(
+            missing.is_empty(),
+            "{} layout glyph(s) never appear in any lesson: {}",
+            missing.len(),
+            missing.join(", ")
+        );
     }
 
     /// See the module-level line-length policy comment: lines longer than

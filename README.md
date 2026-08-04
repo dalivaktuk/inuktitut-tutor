@@ -3,7 +3,7 @@
 A terminal typing tutor for learning Inuktitut syllabics on the Canadian
 `ca(ike)` keyboard layout, built with [ratatui](https://ratatui.rs).
 
-Home-row-first, `fff jjj`-style muscle-memory drills across thirteen graded
+Home-row-first, `fff jjj`-style muscle-memory drills across fourteen graded
 steps, from `ffff jjjj` up through real words and the Shift layer. Moving
 from the home row to the top row, and from the bottom row onward, is gated
 on proficiency (accuracy and wpm) — fall short and the app loops you back
@@ -196,10 +196,10 @@ via `Option` — worth reporting back so this section can be corrected.
 
 ## Progress and the completion screen
 
-Typing the very last cell of Step 13 correctly replaces the normal panels
+Typing the very last cell of Step 14 correctly replaces the normal panels
 with a course-complete recap screen: every step's title alongside the
 wpm/accuracy it last recorded (or "not completed" for any step you skipped
-past with `]` rather than finishing). From there `r` restarts Step 13,
+past with `]` rather than finishing). From there `r` restarts Step 14,
 `[` / `]` go back to browse any step, and `Ctrl+S` / `q` save/quit as usual.
 
 `Ctrl+S` writes which steps are done, their last stats, and which step you
@@ -251,7 +251,7 @@ Your terminal font needs to cover Unified Canadian Aboriginal Syllabics
 - `src/ui.rs` — rendering (keyboard, exercise strip, header, footer)
 - `src/layout.rs` — the `ca(ike)` key table, `Finger` enum, and the
   glyph → key/finger reverse lookup used for display
-- `src/lessons.rs` — the thirteen lesson steps, authored in key notation and
+- `src/lessons.rs` — the fourteen lesson steps, authored in key notation and
   translated to target glyph sequences at load time
 - `src/save.rs` — plain-text progress persistence (`Ctrl+S`)
 - `xkb/ike` — optional custom Linux XKB layout adding a right-Alt level for

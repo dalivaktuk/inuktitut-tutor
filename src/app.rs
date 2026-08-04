@@ -53,7 +53,7 @@ fn stage_of(step: usize) -> Stage {
         0..=5 => Stage::Home,   // STEP 1-6
         6 => Stage::Top,        // STEP 7
         7..=9 => Stage::Bottom, // STEP 8-10
-        _ => Stage::Advanced,   // STEP 11-13
+        _ => Stage::Advanced,   // STEP 11-14
     }
 }
 
