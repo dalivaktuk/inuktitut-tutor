@@ -134,7 +134,7 @@ const SPACEBAR_W: u16 = 30;
 /// panel instead of sitting flush against the left border.
 fn keyboard_content_width() -> u16 {
     [
-        NUMBER_ROW_OFFSET + 10 * KB_CELL_W,
+        NUMBER_ROW_OFFSET + 12 * KB_CELL_W,
         TOP_ROW_OFFSET + 11 * KB_CELL_W,
         HOME_ROW_OFFSET + 9 * KB_CELL_W,
         BOTTOM_ROW_OFFSET + 10 * KB_CELL_W,
@@ -194,10 +194,10 @@ fn draw_keyboard(f: &mut Frame, area: Rect, app: &App) {
         ..rect
     };
 
-    draw_key_row(f, centered(rows[0]), &KEYS[0..10], NUMBER_ROW_OFFSET, loc, shift_active);
-    draw_key_row(f, centered(rows[1]), &KEYS[10..21], TOP_ROW_OFFSET, loc, shift_active);
-    draw_key_row(f, centered(rows[2]), &KEYS[21..30], HOME_ROW_OFFSET, loc, shift_active);
-    draw_key_row(f, centered(rows[3]), &KEYS[30..40], BOTTOM_ROW_OFFSET, loc, shift_active);
+    draw_key_row(f, centered(rows[0]), &KEYS[0..12], NUMBER_ROW_OFFSET, loc, shift_active);
+    draw_key_row(f, centered(rows[1]), &KEYS[12..23], TOP_ROW_OFFSET, loc, shift_active);
+    draw_key_row(f, centered(rows[2]), &KEYS[23..32], HOME_ROW_OFFSET, loc, shift_active);
+    draw_key_row(f, centered(rows[3]), &KEYS[32..42], BOTTOM_ROW_OFFSET, loc, shift_active);
     draw_spacebar(f, centered(rows[4]), target == ' ');
     draw_legend(f, rows[5], app, loc);
 }

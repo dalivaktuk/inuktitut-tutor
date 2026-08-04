@@ -115,7 +115,7 @@ Right-Alt is the level-3 switch (the file ends with
 `AltGr` + `Shift` + a key gives the long form of the shifted glyph.
 
 > **Safe to use with this tutor:** the layout's base and Shift levels were
-> checked key-by-key against `src/layout.rs` and match on **all 40 keys** the
+> checked key-by-key against `src/layout.rs` and match on **all 42 keys** the
 > app models, so the course plays identically whether you run stock
 > `ca(ike)` or this custom layout. The extra long vowels sit on a third level
 > the app never asks for.

@@ -34,12 +34,18 @@ impl Finger {
 /// One physical key: `(key, base_glyph, shift_glyph, finger, is_home_row)`.
 pub type KeyDef = (char, char, Option<char>, Finger, bool);
 
-// Rows in physical order: number, top (QWERTY + [), home (A..L),
-// bottom (Z..M, comma, period, /). The home row (is_home = true) is the
-// whole u-series. Comma/period are plain unshifted ASCII on the real
-// ca(ike) layout (verified against xkeyboard-config's `ike` symbols) --
-// not syllabics -- so their shift slot is None and their base glyph is
-// just themselves.
+// Rows in physical order: number (1..0, -, =), top (QWERTY + [),
+// home (A..L), bottom (Z..M, comma, period, /). The home row
+// (is_home = true) is the whole u-series. Comma/period/minus are plain
+// ASCII on the real ca(ike) layout (verified against xkeyboard-config's
+// `ike` symbols) -- not syllabics -- so their base glyph is just
+// themselves. `-` carries no syllabic at all and is modelled only so the
+// on-screen keyboard puts `=` (ᕝ) in its true physical position rather
+// than crowding it against `0`.
+//
+// Deliberately *not* modelled, and therefore not teachable -- see
+// `KNOWN_UNTAUGHT_SYLLABICS` in the tests below for the reasoning:
+// ᕻ/ᕵ (backtick), ᕹ/ᕷ (ISO-only key), ᐞ (dead key on the base level).
 pub const KEYS: &[KeyDef] = &[
     ('1', '\u{1595}', None, Finger::LPinky, false), // ᖕ
     ('2', '\u{1449}', None, Finger::LRing, false),  // ᑉ
@@ -51,6 +57,8 @@ pub const KEYS: &[KeyDef] = &[
     ('8', '\u{14d0}', None, Finger::RMiddle, false), // ᓐ
     ('9', '\u{14ea}', None, Finger::RRing, false),  // ᓪ
     ('0', '\u{153e}', None, Finger::RPinky, false), // ᔾ
+    ('-', '-', Some('_'), Finger::RPinky, false), // no syllabic; position only
+    ('=', '\u{155d}', Some('='), Finger::RPinky, false), // ᕝ  ⇧=
     ('q', '\u{158f}', Some('\u{148b}'), Finger::LPinky, false), // ᖏ  ⇧ᒋ
     ('w', '\u{1403}', Some('\u{1431}'), Finger::LRing, false), // ᐃ  ⇧ᐱ
     ('e', '\u{157f}', Some('\u{1546}'), Finger::LMiddle, false), // ᕿ  ⇧ᕆ
@@ -195,6 +203,41 @@ mod tests {
         let loc = locate_glyph('?').expect("? should be locatable");
         assert_eq!(loc.key, 'v');
         assert!(loc.shifted);
+    }
+
+    /// Syllabics the real `ca(ike)` layout can produce that `KEYS`
+    /// deliberately does not model. Listed explicitly so a future reader sees
+    /// a decision rather than assuming an oversight -- and so the test below
+    /// fails loudly if one is quietly added to `KEYS` without a lesson.
+    const KNOWN_UNTAUGHT_SYLLABICS: &[(char, &str)] = &[
+        ('\u{157b}', "ᕻ Nunavik H  — backtick key; Nunavik dialect, not requested"),
+        ('\u{1575}', "ᕵ Nunavik HI — backtick key; Nunavik dialect, not requested"),
+        ('\u{1579}', "ᕹ Nunavik HA — ISO-only key, absent from US/ANSI keyboards"),
+        ('\u{1577}', "ᕷ Nunavik HO — ISO-only key, absent from US/ANSI keyboards"),
+        ('\u{141e}', "ᐞ glottal stop — base level is a dead key on stock ca(ike)"),
+    ];
+
+    #[test]
+    fn known_untaught_syllabics_are_genuinely_absent() {
+        for &(g, why) in KNOWN_UNTAUGHT_SYLLABICS {
+            let present = KEYS.iter().any(|&(_, b, s, ..)| b == g || s == Some(g));
+            assert!(
+                !present,
+                "{g} is now in KEYS ({why}). Add a lesson targeting it and \
+                 remove it from KNOWN_UNTAUGHT_SYLLABICS -- otherwise \
+                 every_syllabic_in_the_layout_is_drilled will fail."
+            );
+        }
+    }
+
+    #[test]
+    fn equals_key_produces_the_f_final() {
+        // ᕝ (U+155D) sits on `=` on the real layout. It was unreachable until
+        // that key was modelled, which is why it went untaught.
+        assert_eq!(key_notation_to_glyph('='), Some(('\u{155d}', false)));
+        let loc = locate_glyph('\u{155d}').expect("ᕝ should be on the keyboard");
+        assert_eq!(loc.key, '=');
+        assert!(!loc.shifted);
     }
 
     #[test]

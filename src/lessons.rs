@@ -142,8 +142,14 @@ pub fn all_lessons() -> Vec<Lesson> {
         ),
         Lesson::new(
             "STEP 9 — NUMBER ROW (finals)",
-            "naniit · these end syllables & words",
-            &["4444 7777 2222 5555", "6666 8888 1111 3333 9999 0000"],
+            "naniit · these end syllables & words · = is ᕝ",
+            &[
+                "4444 7777 2222 5555",
+                "6666 8888 1111 3333 9999 0000",
+                // ᕝ (F final) also lives on this row, two keys right of 0.
+                "==== ==== ==== ====",
+                "4= 7= 2= 5= 6= 8= 1=",
+            ],
         ),
         Lesson::new(
             "STEP 10 — PUNCTUATION",
@@ -278,13 +284,20 @@ mod tests {
         }
     }
 
-    /// Every glyph the layout can produce -- base *and* Shift, all 40 keys --
-    /// must be targeted by at least one lesson. Without this, glyphs silently
-    /// go untaught: ᓇ (Shift+N) and ᓚ (Shift+M) were missing for exactly this
-    /// reason, leaving the ᓂᓄᓇ and ᓕᓗᓚ series incomplete.
+    /// Every *syllabic* the layout can produce -- base or Shift, any key --
+    /// must be targeted by at least one lesson. Plain-ASCII levels are exempt
+    /// (`-`/`_`, Shift+`=`, and the punctuation keys' own characters): they
+    /// carry no syllabic to teach. Without this, glyphs silently go untaught
+    /// -- ᓇ (Shift+N) and ᓚ (Shift+M) were missing for exactly this reason,
+    /// and ᕝ was unreachable because its key wasn't modelled at all.
     #[test]
-    fn every_layout_glyph_is_drilled() {
+    fn every_syllabic_in_the_layout_is_drilled() {
         use crate::layout::KEYS;
+
+        // Unified Canadian Aboriginal Syllabics.
+        fn is_syllabic(c: char) -> bool {
+            ('\u{1400}'..='\u{167f}').contains(&c)
+        }
 
         let drilled: std::collections::HashSet<char> = all_lessons()
             .iter()
@@ -295,18 +308,18 @@ mod tests {
 
         let mut missing = Vec::new();
         for &(key, base, shift, ..) in KEYS {
-            if !drilled.contains(&base) {
-                missing.push(format!("{base:?} (base of {key:?})"));
+            if is_syllabic(base) && !drilled.contains(&base) {
+                missing.push(format!("{base} (base of {key:?})"));
             }
             if let Some(s) = shift {
-                if !drilled.contains(&s) {
-                    missing.push(format!("{s:?} (Shift+{})", key.to_ascii_uppercase()));
+                if is_syllabic(s) && !drilled.contains(&s) {
+                    missing.push(format!("{s} (Shift+{})", key.to_ascii_uppercase()));
                 }
             }
         }
         assert!(
             missing.is_empty(),
-            "{} layout glyph(s) never appear in any lesson: {}",
+            "{} syllabic(s) never appear in any lesson: {}",
             missing.len(),
             missing.join(", ")
         );
